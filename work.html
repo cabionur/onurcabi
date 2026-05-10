@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Work — Onur Cabi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@200;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #0a0a0a;
+      --accent: #c8a96e;
+      --white: #f0ece4;
+      --muted: #888;
+      --serif: 'Cormorant Garamond', Georgia, serif;
+      --sans: 'Montserrat', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: var(--sans);
+      font-weight: 200;
+      cursor: none;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    .cursor {
+      position: fixed; width: 8px; height: 8px;
+      background: var(--accent); border-radius: 50%;
+      pointer-events: none; z-index: 9999;
+      transform: translate(-50%, -50%);
+    }
+    .cursor-ring {
+      position: fixed; width: 32px; height: 32px;
+      border: 1px solid rgba(200,169,110,0.5); border-radius: 50%;
+      pointer-events: none; z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: all 0.25s ease;
+    }
+
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 28px 48px;
+      background: rgba(10,10,10,0.97);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .nav-logo {
+      font-family: var(--serif); font-size: 1.1rem; font-weight: 300;
+      letter-spacing: 0.15em; color: var(--white); text-decoration: none;
+    }
+    .nav-logo span { color: var(--accent); }
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a {
+      font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--muted); text-decoration: none; transition: color 0.3s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--accent); }
+
+    .page-header {
+      padding: 140px 48px 60px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .page-header-eyebrow {
+      font-size: 0.6rem; letter-spacing: 0.4em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 20px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .page-header-eyebrow::before {
+      content: ''; width: 40px; height: 1px; background: var(--accent); display: block;
+    }
+    .page-header h1 {
+      font-family: var(--serif);
+      font-size: clamp(3rem, 6vw, 5.5rem);
+      font-weight: 300; line-height: 1;
+    }
+    .page-header h1 em { font-style: italic; color: var(--accent); }
+    .page-header p {
+      margin-top: 20px;
+      font-size: 0.72rem; letter-spacing: 0.08em;
+      color: var(--muted); line-height: 1.8;
+    }
+
+    /* Showcase container */
+    .showcase-section {
+      padding: 48px;
+      min-height: calc(100vh - 200px);
+    }
+
+    .showcase-wrap {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 160px);
+      min-height: 640px;
+      background: #0e0e0e;
+      border: 1px solid rgba(255,255,255,0.05);
+      overflow: hidden;
+    }
+
+    /* Placeholder shown before iframe loads */
+    .showcase-placeholder {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 24px;
+      cursor: none;
+      transition: opacity 0.4s;
+    }
+    .showcase-placeholder.hidden { opacity: 0; pointer-events: none; }
+
+    .load-btn {
+      font-family: var(--sans);
+      font-size: 0.6rem; letter-spacing: 0.35em; text-transform: uppercase;
+      color: var(--accent);
+      background: transparent;
+      border: 1px solid var(--accent);
+      padding: 14px 36px;
+      cursor: none;
+      transition: background 0.3s, color 0.3s;
+    }
+    .load-btn:hover {
+      background: var(--accent);
+      color: var(--black);
+    }
+
+    .placeholder-title {
+      font-family: var(--serif);
+      font-size: 1.5rem; font-weight: 300;
+      color: rgba(240,236,228,0.2);
+    }
+    .placeholder-count {
+      font-size: 0.6rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: rgba(255,255,255,0.15);
+    }
+
+    /* Loading bar */
+    .loading-bar {
+      width: 120px; height: 1px;
+      background: rgba(255,255,255,0.08);
+      position: relative; overflow: hidden;
+      display: none;
+    }
+    .loading-bar.active { display: block; }
+    .loading-bar::after {
+      content: '';
+      position: absolute; top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: var(--accent);
+      animation: loadbar 1s ease-in-out infinite;
+    }
+    @keyframes loadbar { to { left: 100%; } }
+
+    .showcase-wrap iframe {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+      border: none;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+    }
+    .showcase-wrap iframe.visible { opacity: 1; }
+
+    footer {
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 32px 48px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    footer p { font-size: 0.6rem; letter-spacing: 0.15em; color: var(--muted); }
+    footer .footer-logo {
+      font-family: var(--serif); font-size: 0.9rem;
+      color: rgba(240,236,228,0.3);
+    }
+
+    @media (max-width: 768px) {
+      nav { padding: 20px 24px; }
+      .nav-links { display: none; }
+      .page-header { padding: 110px 24px 40px; }
+      .showcase-section { padding: 24px; }
+      .showcase-wrap { height: 75vh; }
+      footer { padding: 24px; flex-direction: column; gap: 12px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <nav>
+    <a href="index.html" class="nav-logo">Onur <span>Cabi</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="work.html" class="active">Work</a></li>
+      <li><a href="index.html#about">About</a></li>
+      <li><a href="index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <div class="page-header">
+    <div class="page-header-eyebrow">Selected Films</div>
+    <h1>The <em>work</em></h1>
+    <p>118 films · Documentary · Commercial · Music Video · Narrative</p>
+  </div>
+
+  <div class="showcase-section">
+    <div class="showcase-wrap" id="showcaseWrap">
+
+      <div class="showcase-placeholder" id="placeholder">
+        <div class="placeholder-title">Onur Cabi Films</div>
+        <div class="placeholder-count">118 films on Vimeo</div>
+        <button class="load-btn" id="loadBtn" onclick="loadShowcase()">Load Films</button>
+        <div class="loading-bar" id="loadingBar"></div>
+      </div>
+
+      <!-- iframe injected by JS -->
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2026 Onur Cabi · All rights reserved</p>
+    <div class="footer-logo">onurcabi.com</div>
+    <p>Cinematographer · Photographer</p>
+  </footer>
+
+  <script>
+    // Cursor
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+    });
+    (function animateRing() {
+      rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+      ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+      requestAnimationFrame(animateRing);
+    })();
+
+    // Hover effects
+    document.querySelectorAll('a, button').forEach(el => {
+      el.addEventListener('mouseenter', () => ring.style.transform = 'translate(-50%,-50%) scale(1.8)');
+      el.addEventListener('mouseleave', () => ring.style.transform = 'translate(-50%,-50%) scale(1)');
+    });
+
+    function loadShowcase() {
+      const btn = document.getElementById('loadBtn');
+      const bar = document.getElementById('loadingBar');
+      const placeholder = document.getElementById('placeholder');
+      const wrap = document.getElementById('showcaseWrap');
+
+      btn.style.display = 'none';
+      bar.classList.add('active');
+
+      const iframe = document.createElement('iframe');
+      iframe.src = 'https://vimeo.com/showcase/5690082/embed';
+      iframe.setAttribute('allowfullscreen', '');
+      iframe.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture');
+
+      iframe.onload = () => {
+        placeholder.classList.add('hidden');
+        setTimeout(() => {
+          placeholder.style.display = 'none';
+          iframe.classList.add('visible');
+        }, 400);
+      };
+
+      wrap.appendChild(iframe);
+    }
+  </script>
+</body>
+</html>
